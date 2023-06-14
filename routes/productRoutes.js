@@ -132,13 +132,17 @@ router.post('/decrease-cart', async(req, res)=> {
   try {
     const user = await User.findById(userId);
     const userCart = user.cart;
-    userCart.total -= Number(price);
-    userCart.count -= 1;
-    userCart[productId] -= 1;
-    user.cart = userCart;
-    user.markModified('cart');
-    await user.save();
-    res.status(200).json(user);
+    if (userCart[productId] > 1) {
+      userCart.total -= Number(price);
+      userCart.count -= 1;
+      userCart[productId] -= 1;
+      user.cart = userCart;
+      user.markModified('cart');
+      await user.save();
+      res.status(200).json(user);
+    } else {
+      res.status(200).json(user);
+    }
   } catch (e) {
     res.status(400).send(e.message);
   }
